@@ -1,0 +1,62 @@
+{
+  "pluginAlias": "ModernFormsFan",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Control your Modern Forms (and WAC) smart fans and their lights from Apple Home, over your local network. Fans set up in the Modern Forms app are found automatically.",
+  "footerDisplay": "Fans keep their Home setup when their IP address changes. To remove a fan you no longer have, remove its cached accessory in the Homebridge settings.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "Modern Forms Fan",
+        "required": true,
+        "description": "Name shown in the Homebridge logs."
+      },
+      "discovery": {
+        "title": "Find fans automatically",
+        "type": "boolean",
+        "default": true,
+        "description": "Looks for fans on your network (mDNS). Turn off only if you list every fan below."
+      },
+      "hosts": {
+        "title": "Fan addresses",
+        "type": "array",
+        "description": "IP addresses or host names of fans to add even if they aren't found automatically, e.g. when Homebridge runs on a different network segment. Optional.",
+        "items": {
+          "title": "Address",
+          "type": "string",
+          "placeholder": "192.168.1.50"
+        }
+      },
+      "pollingIntervalSeconds": {
+        "title": "Background check interval (seconds)",
+        "type": "integer",
+        "default": 60,
+        "minimum": 0,
+        "description": "How often to check each fan for changes made with its remote, wall control or the Modern Forms app. Status is also refreshed whenever the Home app shows the fan. Minimum 10; 0 turns background checks off."
+      }
+    }
+  },
+  "layout": [
+    "name",
+    "discovery",
+    {
+      "key": "hosts",
+      "type": "array",
+      "buttonText": "Add fan address",
+      "items": [
+        "hosts[]"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Advanced",
+      "expandable": true,
+      "items": [
+        "pollingIntervalSeconds"
+      ]
+    }
+  ]
+}
