@@ -2,7 +2,7 @@
   "pluginAlias": "ModernFormsFan",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "Control your Modern Forms (and WAC) smart fans and their lights from Apple Home, over your local network. Fans set up in the Modern Forms app are found automatically.",
+  "headerDisplay": "Control your Modern Forms (and WAC) smart fans and their lights from Apple Home, over your local network.\n\n**You don't need to enter anything here.** Fans set up in the Modern Forms app announce themselves on your network (mDNS, like AirPlay speakers), so the plugin finds them, names them as in the app, and follows them if their IP address changes. Each fan found shows up in the log, e.g. \"Adding Living Room Fan (192.168.1.50)\".\n\nOnly if no fans are found (usually because Homebridge is on a different network or VLAN than the fans) do you need to list their IP addresses below. [More details](https://github.com/guilhermechapiewski/homebridge-modernforms-fan#how-fans-are-found).",
   "footerDisplay": "Fans keep their Home setup when their IP address changes. To remove a fan you no longer have, remove its cached accessory in the Homebridge settings.",
   "schema": {
     "type": "object",
@@ -18,12 +18,12 @@
         "title": "Find fans automatically",
         "type": "boolean",
         "default": true,
-        "description": "Looks for fans on your network (mDNS). Turn off only if you list every fan below."
+        "description": "Finds fans on your network automatically and follows them when their IP address changes. Leave on unless every fan is listed under Fan addresses."
       },
       "hosts": {
         "title": "Fan addresses",
         "type": "array",
-        "description": "IP addresses or host names of fans to add even if they aren't found automatically, e.g. when Homebridge runs on a different network segment. Optional.",
+        "description": "Only needed if fans aren't found automatically, e.g. when Homebridge is on a different network or VLAN than the fans. Find the addresses in your router's client list (fans are usually named MF_Fan_XXXXXX) and give them DHCP reservations so they don't change.",
         "items": {
           "title": "Address",
           "type": "string",

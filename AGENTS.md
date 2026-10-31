@@ -101,6 +101,7 @@ See the trimlight-edge AGENTS.md for the HOOBS details. They apply here too: ins
 ## Status (update as work lands)
 
 - 0.1.0 implemented: discovery, fan on/off, speed and direction, light on/off and brightness. Unit tests (98) and e2e are green on Homebridge 1.3.4 and 1.5.0 (Node 16), 1.11.4 and 2.4.0 (Node 22). Checks against the owner's real Gen 3 fans passed: discovery, static and dynamic data, and (with the owner's go-ahead) every command type, with the fan restored to its starting state afterwards.
-- **Next:** publish (owner runs `npm publish`), install on HOOBS, and run an on-phone checklist (tile, speed slider, direction, light, Siri, remote/wall-control change, power cut at the wall, restart).
+- 0.1.0 published by the owner (2026-10-30). 0.1.1 adds the "How fans are found" explanation to the README and the settings screen (the owner asked how it could work without IP addresses; future users will too). Keep the form's header short and link to the README for details.
+- **Next:** publish 0.1.1 (owner runs `npm publish`), install on HOOBS, and run an on-phone checklist (tile, speed slider, direction, light, Siri, remote/wall-control change, power cut at the wall, restart).
 - Later: breeze mode (maybe as Fanv2 SwingMode), sleep timers, away mode, Gen 4 support.
 - Releasing a new version: bump `version` in package.json, verify (lint, test, e2e including against the packed tarball and the version matrix), commit, then the owner runs `npm publish` and pushes.

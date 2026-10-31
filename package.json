@@ -1,7 +1,7 @@
 {
   "name": "homebridge-modernforms-fan",
   "displayName": "Modern Forms Fan",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Homebridge plugin to control Modern Forms smart fans (and their lights) from Apple Home over the local network.",
   "license": "ISC",
   "author": "Guilherme Chapiewski",
