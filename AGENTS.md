@@ -65,7 +65,9 @@ Source: WAC's "Smart Fans IP API Definition for 3rd Party Integrations" (2021). 
 - Gen 3 `/config-read` reports Wi-Fi as `wifiSignal` (not the documented `Wi-Fi strength`).
 - **The embedded web server can get stuck:** one fan (02.00.0043) answered ping (slowly, 100–240 ms) and mDNS but refused TCP port 80 for the whole session, and later stopped answering mDNS too. Home Assistant users report the same ([thread](https://community.home-assistant.io/t/modern-forms-fan-intermittently-unavailable-http-api-on-port-80-stops-responding/1024570)). A power cycle at the breaker or wall switch is the usual fix. The plugin shows "No Response" and recovers on its own when the fan answers again.
 - mDNS answers to a legacy-unicast query (sent from an ephemeral port) arrive as one packet per fan with PTR, SRV, TXT and A records. `dns-sd -B` on macOS can miss fans for a few seconds; the plugin's own query found all of them.
-- **Not yet verified on a real fan** (needs the owner's go-ahead; see Status): that a command's answer already shows the new values; what a brightness-only command does to a dark light; the "flash at the old brightness" that aiomodernforms works around (its issue #99); and what `fanSpeed` alone does to a fan that's off.
+- **Commands (verified 2026-10-30 on a Gen 3 fan, 02.00.0052):** the answer to a command already shows the new values, and a read 1.5 s later always matched. Commands usually take 0.5–1.3 s, but **turning the fan on took 2.5 s** (the motor spinning up), so keep the per-attempt timeout ≥ 4 s. Changing direction while spinning works.
+- **`fanSpeed` alone doesn't start a stopped fan, and `lightBrightness` alone doesn't turn on a dark light.** Both just store the value. That's why a HomeKit speed/brightness write implies "on" (see below); without it, "set the fan to 50%" would do nothing on a stopped fan.
+- `{"lightOn":true,"lightBrightness":10}` in one request works. Whether it visibly flashes at the old brightness first (aiomodernforms issue #99) needs someone watching the light. Brightness-first costs about 0.5 s, so the plugin keeps that order.
 
 ## HomeKit mapping (design)
 
@@ -73,7 +75,7 @@ Source: WAC's "Smart Fans IP API Definition for 3rd Party Integrations" (2021). 
 - **Speed:** HomeKit percent ↔ 6 speeds: `percent = round(speed × 100 / 6)` (17/33/50/67/83/100) and `speed = clamp(round(percent × 6 / 100), 1, 6)`. After a write, the real value is pushed on the next tick: HAP stores the written value when `onSet` resolves, so pushing earlier gets overwritten.
 - **Direction:** forward/summer = COUNTER_CLOCKWISE (blades push air down, seen from below); reverse/winter = CLOCKWISE.
 - Speed > 0 implies fan on and brightness > 0 implies light on, unless the same batch has an explicit on/off (scenes send both). 0 % turns it off.
-- **Writes are coalesced for 50 ms** into one command, because HomeKit sends On + Brightness (or Active + speed) as separate writes. Turning a dark light on with a brightness sends `{lightBrightness}` first, then `{lightOn:true}` (the aiomodernforms workaround for the flash).
+- **Writes are coalesced for 50 ms** into one command, because HomeKit sends On + Brightness (or Active + speed) as separate writes. Turning a dark light on with a brightness sends `{lightBrightness}` first, then `{lightOn:true}` (the aiomodernforms workaround for the flash; the fan accepts both orders).
 - Status shown = last known status + unconfirmed writes on top, so a stale poll can't flip the tile back mid-command.
 
 ## Refresh model
@@ -98,7 +100,7 @@ See the trimlight-edge AGENTS.md for the HOOBS details. They apply here too: ins
 
 ## Status (update as work lands)
 
-- 0.1.0 implemented: discovery, fan on/off, speed and direction, light on/off and brightness. Unit tests (98) and e2e are green on Homebridge 1.3.4 and 1.5.0 (Node 16), 1.11.4 and 2.4.0 (Node 22). Read-only checks against the owner's Gen 3 fans passed (discovery, static and dynamic data).
-- **Next:** with the owner's go-ahead, run the real-fan command checks listed under "Not yet verified", then commit any adjustments. After that: publish (owner runs `npm publish`), install on HOOBS, and run an on-phone checklist (tile, speed slider, direction, light, Siri, remote/wall-control change, power cut at the wall, restart).
+- 0.1.0 implemented: discovery, fan on/off, speed and direction, light on/off and brightness. Unit tests (98) and e2e are green on Homebridge 1.3.4 and 1.5.0 (Node 16), 1.11.4 and 2.4.0 (Node 22). Checks against the owner's real Gen 3 fans passed: discovery, static and dynamic data, and (with the owner's go-ahead) every command type, with the fan restored to its starting state afterwards.
+- **Next:** publish (owner runs `npm publish`), install on HOOBS, and run an on-phone checklist (tile, speed slider, direction, light, Siri, remote/wall-control change, power cut at the wall, restart).
 - Later: breeze mode (maybe as Fanv2 SwingMode), sleep timers, away mode, Gen 4 support.
 - Releasing a new version: bump `version` in package.json, verify (lint, test, e2e including against the packed tarball and the version matrix), commit, then the owner runs `npm publish` and pushes.
