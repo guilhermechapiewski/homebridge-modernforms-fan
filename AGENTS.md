@@ -96,6 +96,7 @@ Source: WAC's "Smart Fans IP API Definition for 3rd Party Integrations" (2021). 
 
 See the trimlight-edge AGENTS.md for the HOOBS details. They apply here too: install from npm (HOOBS can't install local files), the HOOBS plugin directory indexes new packages with a delay, reboot the box if the settings form doesn't show, and the desktop settings page crashes for brand-new plugins (narrow the window). With this plugin there are no credentials to set, so the default config works even before the form shows.
 
+- **The desktop settings-page crash happened here too** (2026-10-31, right after installing 0.1.2): `TypeError: Reduce of empty array with no initial value` in HOOBS's `main.js`; the mobile layout works. The HOOBS directory had 0 download entries because npm's download stats didn't know the package yet. Trimlight's had grown to 365 by then and its page worked, so this resolves on its own (maybe after a HOOBS reboot). Check with `curl -s https://plugins.hoobs.org/api/homebridge-modernforms-fan | jq '.downloads | length'` (needs ≥ ~360). Don't debug our package over it.
 - mDNS needs the HOOBS box on the same network segment as the fans. Otherwise list them under `hosts`, ideally with DHCP reservations.
 
 ## Status (update as work lands)
